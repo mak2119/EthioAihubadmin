@@ -25,6 +25,7 @@ import {
 import { Language } from '../types/admin';
 import { TRANSLATIONS } from '../utils/translations';
 import { adminStore } from '../services/admin-data';
+import { jobPortalStore } from '../services/job-portal-data';
 
 interface SidebarProps {
   currentView: string;
@@ -48,6 +49,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const pendingPayments = adminStore.payments.filter((p) => p.status === 'pending').length;
   const pendingComplaints = adminStore.complaints.filter((c) => c.status === 'pending').length;
   const pendingBrokers = adminStore.brokers.filter((b) => b.status === 'pending').length;
+  const pendingJobPortal = jobPortalStore.employers.filter((e) => e.status === 'pending').length +
+    jobPortalStore.jobs.filter((j) => j.status === 'pending_review').length +
+    jobPortalStore.payments.filter((p) => p.status === 'pending').length;
 
   const navGroups = [
     {
@@ -65,8 +69,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ],
     },
     {
-      groupTitle: currentLang === 'am' ? 'አገልግሎቶችና ይዘት' : currentLang === 'or' ? 'Tajaajila fi Qabiyyee' : 'PLATFORM SERVICES',
+      groupTitle: currentLang === 'am' ? 'የስራ ፖርታልና አገልግሎቶች' : currentLang === 'or' ? 'Pootaala Hojii fi Tajaajila' : 'JOB PORTAL & SERVICES',
       items: [
+        {
+          id: 'job-portal',
+          label: currentLang === 'am' ? 'የስራ ፖርታል ማኔጀር' : currentLang === 'or' ? 'Maanajera Pootaala Hojii' : 'Job Portal Manager',
+          icon: Briefcase,
+          count: pendingJobPortal,
+        },
         { id: 'tools', label: t.navAITools, icon: Cpu },
         { id: 'jobs', label: t.navJobs, icon: Briefcase },
         { id: 'homes', label: t.navHomes, icon: Home },

@@ -18,6 +18,7 @@ import {
 import { Language } from '../types/admin';
 import { TRANSLATIONS } from '../utils/translations';
 import { adminStore } from '../services/admin-data';
+import { jobPortalStore } from '../services/job-portal-data';
 import { formatETB } from '../utils/admin-logic';
 
 interface DashboardViewProps {
@@ -381,14 +382,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ currentLang, onNav
             </h4>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => onNavigate('jobs')}
-                className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/60 text-left hover:border-emerald-500 transition"
+                onClick={() => onNavigate('job-portal')}
+                className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 text-left hover:border-emerald-500 transition group"
               >
-                <Briefcase className="w-4 h-4 text-emerald-500 mb-1" />
+                <div className="flex items-center justify-between mb-1">
+                  <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition" />
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-slate-950">አዲስ</span>
+                </div>
                 <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">
-                  የስራ ማስታወቂያ
+                  የስራ ፖርታል ማኔጀር
                 </span>
-                <span className="text-[10px] text-slate-400">{activeJobs} ንቁ ስራዎች</span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                  {jobPortalStore.jobs.filter((j) => j.status === 'approved').length} ንቁ • {jobPortalStore.jobs.filter((j) => j.status === 'pending_review').length} በግምገማ
+                </span>
               </button>
 
               <button

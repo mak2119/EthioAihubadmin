@@ -25,9 +25,11 @@ import { SettingsView } from './components/SettingsView';
 import { AuditLogsView } from './components/AuditLogsView';
 import { ProfileView } from './components/ProfileView';
 import { DeploymentHubView } from './components/DeploymentHubView';
+import { JobPortalManagerView } from './components/JobPortalManagerView';
 import { AdminLoginGate } from './components/AdminLoginGate';
 import { Language } from './types/admin';
 import { adminStore } from './services/admin-data';
+import { jobPortalStore } from './services/job-portal-data';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
@@ -36,13 +38,19 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
-  // Re-render when adminStore emits changes
+  // Re-render when adminStore or jobPortalStore emits changes
   const [, setStoreVersion] = useState(0);
   useEffect(() => {
-    const unsubscribe = adminStore.subscribe(() => {
+    const unsub1 = adminStore.subscribe(() => {
       setStoreVersion((v) => v + 1);
     });
-    return unsubscribe;
+    const unsub2 = jobPortalStore.subscribe(() => {
+      setStoreVersion((v) => v + 1);
+    });
+    return () => {
+      unsub1();
+      unsub2();
+    };
   }, []);
 
   // Sync dark mode class on <html> element
@@ -113,6 +121,7 @@ export default function App() {
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {currentView === 'dashboard' && <DashboardView currentLang={currentLang} onNavigate={handleSelectView} />}
+          {currentView === 'job-portal' && <JobPortalManagerView currentLang={currentLang} />}
           {currentView === 'users' && <UsersView currentLang={currentLang} />}
           {currentView === 'subscriptions' && <SubscriptionsView currentLang={currentLang} />}
           {currentView === 'payments' && <PaymentsView currentLang={currentLang} />}
