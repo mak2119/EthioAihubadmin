@@ -1,0 +1,6 @@
+{
+  "name": "Ethio AI Hub Admin Control Panel",
+  "description": "Enterprise administration dashboard for ETHIO AI HUB: user management, subscriptions, TeleBirr payments, AI tools, academy, complaints, maintenance, and platform security.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

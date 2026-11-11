@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="am" class="dark-mode">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETHIO AI HUB – የዋና አስተዳዳሪ መቆጣጠሪያ ፓነል (Admin Panel)</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Noto Sans Ethiopic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Modular Stylesheets -->
+  <link rel="stylesheet" href="css/admin.css" />
+  <link rel="stylesheet" href="css/admin-responsive.css" />
+  <link rel="stylesheet" href="css/admin-components.css" />
+</head>
+<body class="dark-mode">
+
+  <div id="admin-app" class="admin-app-container">
+    <div class="admin-loading-screen" id="admin-loading-screen">
+      <div class="admin-spinner"></div>
+      <p>ኢትዮ አይአይ ሀብ አስተዳዳሪ ፓነል በመጫን ላይ ነው...</p>
+    </div>
+  </div>
+
+  <!-- Firebase JS SDK v10 Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+  <!-- Firebase App Configuration -->
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/firebase.js"></script>
+
+  <!-- Admin Modular Application Scripts -->
+  <script src="js/admin-router.js"></script>
+  <script src="js/admin-auth.js"></script>
+  <script src="js/admin-app.js"></script>
+</body>
+</html>

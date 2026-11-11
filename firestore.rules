@@ -1,0 +1,127 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for secure authorization
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Role-based authorization using trusted Firebase Custom Claims
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      // Ordinary users can only read their own profile; Admin can read all
+      allow read: if isOwner(userId) || isAdmin();
+      // Users can only create their initial account and update non-privileged fields
+      allow create: if isOwner(userId);
+      // Users CANNOT change their plan, role, or subscription status! Only Admin can.
+      allow update: if (isOwner(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['plan', 'role', 'subscriptionEndDate', 'admin']))
+        || isAdmin();
+      allow delete: if isAdmin();
+
+      // Courses subcollection
+      match /courses/{courseId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+
+    // 2. Platform Settings
+    match /settings/{settingId} {
+      allow read: if true; // Publicly readable for pricing, maintenance check, TeleBirr phone
+      allow write: if isAdmin(); // Only verified Admin can modify settings
+    }
+
+    // 3. AI Tools Matrix
+    match /tools/{toolId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 4. Payment Requests
+    match /paymentRequests/{paymentId} {
+      // Users can view their own payments, Admin views all
+      allow read: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+      // Users can submit a payment request
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      // Users CANNOT approve their own payment! Only Admin can approve/reject.
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 5. Job Advertisements
+    match /jobs/{jobId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 6. Home Finder Properties
+    match /properties/{propId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow create: if isSignedIn(); // User submission
+      allow update, delete: if isAdmin();
+    }
+
+    // 7. Broker Reports
+    match /brokerReports/{reportId} {
+      // Never publicly readable! Admin only, or submitter can read
+      allow read: if isAdmin() || (isSignedIn() && resource.data.submittedBy == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // 8. Ethio Academy Courses
+    match /courses/{courseId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 9. Course Payments
+    match /coursePayments/{paymentId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // 10. Complaints & Support
+    match /complaints/{complaintId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 11. Notifications
+    match /notifications/{notifId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // 12. Ethio Drive Official Sources
+    match /officialSources/{sourceId} {
+      allow read: if resource.data.approved == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 13. EthioVerify Transaction Audits
+    match /transactionVerifications/{txId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 14. Admin Audit Logs (Append-Only)
+    match /adminLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false; // Immutable! Never modify or delete logs.
+    }
+  }
+}

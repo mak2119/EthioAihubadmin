@@ -1,0 +1,41 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // Payment Screenshots (TeleBirr receipts)
+    match /payments/{paymentId}/{fileName} {
+      allow create: if isSignedIn()
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == request.resource.metadata.uid);
+      allow delete: if isAdmin();
+    }
+
+    // Property photos
+    match /properties/{propId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Course materials and thumbnails
+    match /academy/{courseId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Broker allegation evidence
+    match /broker_evidence/{reportId}/{fileName} {
+      allow create: if isSignedIn() && request.resource.size < 5 * 1024 * 1024;
+      allow read: if isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}
